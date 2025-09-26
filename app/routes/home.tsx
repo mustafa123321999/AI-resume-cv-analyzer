@@ -24,10 +24,6 @@ export default function Home() {
 
     }, [auth.isAuthenticated])
 
-    console.log(auth.isAuthenticated)
-
-
-
 
 
 
