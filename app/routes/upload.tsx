@@ -90,6 +90,8 @@ const Upload = () => {
 
         console.log(data)
 
+        navgate(`/resume/${uuid}`)
+
 
 
     }
