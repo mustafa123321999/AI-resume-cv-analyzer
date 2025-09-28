@@ -1,18 +1,21 @@
 import { Nav } from "~/components";
-import { CVcard } from "~/components";
+import { ResumeCard } from "~/components";
 import type { Route } from "./+types/home";
-import { resumes } from '/constants';
-
-import React, { useEffect } from 'react'
-import { useLocation, useNavigate } from 'react-router';
+import React, { use, useEffect, useState } from 'react'
+import { Link, useNavigate } from 'react-router';
 import { usePuterStore } from "~/lib/puter";
 
 
 export default function Home() {
 
-    const { auth } = usePuterStore();
+    const { auth, kv } = usePuterStore();
 
     const navigate = useNavigate();
+
+    const [ resumes, setResumes ] = useState<Resume[]>([]);
+    const [ loadingResumes , setloadingResumes] = useState(false);
+
+    const [ resumeUrl, setResumeUrl ] = useState('')
 
     useEffect( () => {
 
@@ -23,6 +26,35 @@ export default function Home() {
         }
 
     }, [auth.isAuthenticated])
+
+    useEffect( () => {
+
+      const loadResumes = async () => {
+        
+        setloadingResumes(true)
+
+        const resumes = (await kv.list('resume:*', true )) as KVItem[];
+
+        const parsedResumes = resumes?.map(( resume ) => (
+
+          JSON.parse(resume.value) as Resume
+
+        ))
+
+        console.log(parsedResumes)
+
+        setResumes( parsedResumes || [])
+
+        setloadingResumes(false)
+
+      }
+
+      loadResumes()
+
+
+    }, [])
+
+
 
 
 
@@ -36,43 +68,79 @@ export default function Home() {
 
         <Nav />
 
-        {/* {window.puter.ai.chat()} */}
-
-
-
         <section className="main-section">
 
           <div className="page-heading py-16">
 
             <h1>Track You;r Applications & Resume Ratings.</h1>
-            <h2>Review your submissions and check AI-powered feedback.</h2>
 
+            {
+
+              !loadingResumes && resumes.length === 0 ? (
+
+                <h2>No Resumes found upload You'r first Resume to get feedBack.</h2>
+
+              ) : (
+
+                <h2>Review your submissions and check AI-powered feedback.</h2>
+
+              )
+
+            }
 
           </div>
 
+          { 
+            
+              loadingResumes && (
 
-          {resumes.length > 0 && (
+                <div className="flex flex-col items-center justify-center">
 
-            <div className="resumes-section">
+                  <img src="/images/resume-scan-2.gif" alt="" className="w-[200px]"/>
 
-                {resumes.map((res:any) => (
+                </div>
 
-                  <CVcard key={res.id} resume={res} />
+              )
 
-                ))}
+          }
 
-            </div>  
+          {
+          
+            !loadingResumes &&  resumes.length > 0 && (
+
+              <div className="resumes-section">
+
+                  {resumes.map((res:any) => (
+
+                    <ResumeCard key={res.id} resume={res} />
+
+                  ))}
+
+              </div>  
+
+            ) 
+          }
+
+          {
+
+            !loadingResumes && resumes.length > 0 && (
+
+              <div className="flex items-center justify-center flex-col mt-10 gap-4">
+
+                <Link to="/upload" className="primary-button w-fit text-xl font-semibold"> Upload Resume </Link>
+
+              </div>
+
+            )
 
 
-          )}
+          }
 
 
         </section>
 
+      </main>
 
-
-
-        </main>
     </>
   );
 }

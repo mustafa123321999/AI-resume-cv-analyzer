@@ -1,8 +1,7 @@
 import Nav from "./Nav";
-import CVcard from "./CVcard";
-
+import ResumeCard from "./ResumeCard.tsx";
 
 export {
     Nav,
-    CVcard
+    ResumeCard
 }
