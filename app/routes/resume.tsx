@@ -138,7 +138,7 @@ const resume = () => {
                             <ATS feedback={feedback.ATS.score || 0} suggestions={feedback.ATS.tips || []}/>
                             <Details feedback={feedback}/>
 
-                        </div>
+                        </div>  
 
 
                     ) :(
